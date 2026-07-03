@@ -60,6 +60,14 @@ playcheck adds `--check --diff` itself — it never applies changes. The exit
 code mirrors `ansible-playbook`'s (0 on success even when changes are
 pending; non-zero on task failures or unreachable hosts).
 
+For CI gating there are two opt-in exit codes, checked in this order after a
+clean ansible run:
+
+| flag | exit code | meaning |
+|---|---|---|
+| `--fail-on-changes` | 3 | at least one task would change something |
+| `--fail-on-unpreviewable` | 4 | at least one task could not be simulated |
+
 `--format markdown` emits a GitHub-flavored report (collapsible per-host
 sections, fenced diffs) suitable for PR comments and `$GITHUB_STEP_SUMMARY`.
 

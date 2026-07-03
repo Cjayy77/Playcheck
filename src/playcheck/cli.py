@@ -7,6 +7,7 @@ import sys
 from typing import List, Optional
 
 from . import __version__
+from .model import Category
 from .parse import parse_events
 from .render import render
 from .runner import AnsibleNotFound, run
@@ -54,6 +55,16 @@ def _build_parser() -> argparse.ArgumentParser:
         help="output format: terminal (default) or markdown for PR comments",
     )
     run_p.add_argument("--no-color", action="store_true", help="disable colored output")
+    run_p.add_argument(
+        "--fail-on-changes",
+        action="store_true",
+        help="exit 3 if any task would change (CI gating)",
+    )
+    run_p.add_argument(
+        "--fail-on-unpreviewable",
+        action="store_true",
+        help="exit 4 if any task could not be previewed (CI gating)",
+    )
     run_p.add_argument("--quiet", action="store_true", help="no live progress while ansible runs")
     run_p.add_argument(
         "--ansible-playbook-bin",
@@ -122,7 +133,16 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(render_markdown(report), end="")
     else:
         print(render(report, color=_want_color(args.no_color)), end="")
-    return outcome.returncode
+
+    if outcome.returncode != 0:
+        return outcome.returncode
+    if args.fail_on_changes and report.count(
+        Category.CHANGED, Category.CHANGED_DIFF_HIDDEN
+    ):
+        return 3
+    if args.fail_on_unpreviewable and report.count(Category.NOT_PREVIEWABLE):
+        return 4
+    return 0
 
 
 if __name__ == "__main__":
