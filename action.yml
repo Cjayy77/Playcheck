@@ -1,7 +1,7 @@
 name: "Playcheck"
-description: >
-  Run ansible-playbook --check --diff and post a readable per-host preview as
-  a PR comment, flagging tasks that cannot be simulated (terraform plan-style).
+description: >-
+  Terraform plan-style Ansible previews: post a readable --check --diff
+  summary as a PR comment and flag unsimulated tasks.
 branding:
   icon: "eye"
   color: "purple"
