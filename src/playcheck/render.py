@@ -11,7 +11,14 @@ import difflib
 import json
 from typing import Any, Dict, List
 
-from .model import Category, HostReport, RunReport, TaskResult
+from .model import (
+    Category,
+    HostGroup,
+    HostReport,
+    RunReport,
+    TaskResult,
+    group_identical_hosts,
+)
 
 
 class Palette:
@@ -86,19 +93,24 @@ _HIDDEN_REASON = {
 }
 
 
-def _host_headline(h: HostReport, p: Palette) -> str:
+def _host_headline(g: HostGroup, p: Palette) -> str:
+    h = g.report
     changes = h.count(Category.CHANGED, Category.CHANGED_DIFF_HIDDEN)
     blind = h.count(Category.NOT_PREVIEWABLE)
-    failed = h.count(Category.FAILED, Category.UNREACHABLE)
-    parts = [f"{changes} change{'s' if changes != 1 else ''}"]
+    failed = h.count(Category.FAILED)
+    unreachable = h.count(Category.UNREACHABLE)
+    each = " each" if len(g.hosts) > 1 else ""
+    parts = [f"{changes} change{'s' if changes != 1 else ''}{each}"]
     if blind:
         parts.append(p.paint(f"{blind} not previewable", p.magenta, p.bold))
     if failed:
         parts.append(p.paint(f"{failed} failed", p.red, p.bold))
+    if unreachable:
+        parts.append(p.paint("unreachable", p.red, p.bold))
     ran = h.count(Category.RAN_FOR_REAL)
     if ran:
         parts.append(p.paint(f"{ran} ran for real", p.yellow))
-    return f"{p.paint(h.host, p.bold, p.cyan)}  {' · '.join(parts)}"
+    return f"{p.paint(g.label(), p.bold, p.cyan)}  {' · '.join(parts)}"
 
 
 def _render_task(r: TaskResult, p: Palette) -> List[str]:
@@ -142,7 +154,7 @@ def render(report: RunReport, color: bool = True) -> str:
     out.append(p.paint("Playcheck", p.bold) + p.paint(" — ansible --check --diff preview", p.dim))
     out.append("")
 
-    if report.no_hosts_matched:
+    if report.no_hosts_matched and not report.hosts:
         out.append(p.paint("No hosts matched the play pattern — nothing was checked.", p.red, p.bold))
         return "\n".join(out) + "\n"
 
@@ -155,9 +167,14 @@ def render(report: RunReport, color: bool = True) -> str:
         Category.UNREACHABLE,
     )
 
-    for host in sorted(report.hosts):
-        h = report.hosts[host]
-        out.append(_host_headline(h, p))
+    for group in group_identical_hosts(report.hosts):
+        h = group.report
+        out.append(_host_headline(group, p))
+        if len(group.hosts) > 1:
+            names = " ".join(group.hosts[:20])
+            if len(group.hosts) > 20:
+                names += f" … (+{len(group.hosts) - 20} more)"
+            out.append("  " + p.paint(f"= identical on: {names}", p.dim))
         shown = [r for r in h.results if r.category in interesting]
         for r in shown:
             out.extend(_render_task(r, p))
@@ -188,6 +205,8 @@ def render(report: RunReport, color: bool = True) -> str:
     out.append(p.paint("SUMMARY", p.bold))
     host_line = f"  hosts: {hosts_changed} of {hosts_total} would change"
     out.append(host_line)
+    if report.no_hosts_matched:
+        out.append("  " + p.paint("⚠ one or more plays matched no hosts in this inventory", p.yellow))
     task_line = f"  tasks: {changed} would change"
     if hidden:
         task_line += f" ({hidden} with hidden diffs)"
