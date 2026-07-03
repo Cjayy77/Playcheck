@@ -47,7 +47,7 @@ Sequencing guard: this exists here so it's ready when the time comes, not to be 
 
 ## License / distribution (context, not implementation-relevant day to day)
 
-License decision deferred as of 2026-07-03 (owner reconsidering MIT vs. alternatives for commercial reasons; repo currently declares no license, i.e. all rights reserved). Original plan was MIT open core — free CLI permissive, paid hosted dashboard closed-source. **A license must be chosen before any visibility push or PyPI publish**; unlicensed repos get no adoption. GitHub Sponsors for funding. Visibility push (r/devops, r/ansible, Ansible forums/Discord, Show HN) only once the CLI actually works well — no parallel marketing before that.
+MIT, open core (decision settled 2026-07-03 after a brief deferral: the free CLI/Action is MIT so people adopt it — MIT fully permits the owner's own commercial use; the future paid hosted tier stays closed-source in a separate repo). GitHub Sponsors for funding. Visibility push (r/devops, r/ansible, Ansible forums/Discord, Show HN) only once the CLI actually works well — no parallel marketing before that.
 
 ## When returning to this project in a new session
 
