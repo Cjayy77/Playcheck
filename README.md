@@ -140,4 +140,4 @@ ansible-playbook testdata/site.yml -i testdata/inventory.ini --check --diff \
 
 ## License
 
-MIT
+License not yet finalized. All rights reserved until a LICENSE file lands.

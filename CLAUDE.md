@@ -37,7 +37,7 @@ Later still (only with real free-tier adoption): a paid hosted dashboard for tea
 
 ## License / distribution (context, not implementation-relevant day to day)
 
-MIT, open core. GitHub Sponsors for funding. Visibility push (r/devops, r/ansible, Ansible forums/Discord, Show HN) only once the CLI actually works well — no parallel marketing before that.
+License decision deferred as of 2026-07-03 (owner reconsidering MIT vs. alternatives for commercial reasons; repo currently declares no license, i.e. all rights reserved). Original plan was MIT open core — free CLI permissive, paid hosted dashboard closed-source. **A license must be chosen before any visibility push or PyPI publish**; unlicensed repos get no adoption. GitHub Sponsors for funding. Visibility push (r/devops, r/ansible, Ansible forums/Discord, Show HN) only once the CLI actually works well — no parallel marketing before that.
 
 ## When returning to this project in a new session
 
