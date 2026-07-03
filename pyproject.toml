@@ -9,7 +9,7 @@ description = "Readable, per-host summaries of ansible-playbook --check --diff r
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.9"
-authors = [{ name = "Cedric Eboule" }]
+authors = [{ name = "Cedric Julien" }]
 keywords = ["ansible", "check-mode", "diff", "dry-run", "devops"]
 classifiers = [
     "Development Status :: 3 - Alpha",

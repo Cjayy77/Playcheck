@@ -1,5 +1,11 @@
 # playcheck
 
+[![CI](https://github.com/Cjayy77/Playcheck/actions/workflows/ci.yml/badge.svg)](https://github.com/Cjayy77/Playcheck/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/playcheck)](https://pypi.org/project/playcheck/)
+[![Python](https://img.shields.io/pypi/pyversions/playcheck)](https://pypi.org/project/playcheck/)
+[![ansible-core](https://img.shields.io/badge/ansible--core-2.15%20%E2%86%92%202.21-black)](https://github.com/Cjayy77/Playcheck/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 Readable previews for `ansible-playbook --check --diff`.
 
 Ansible's check mode tells you what a playbook *would* change — but the raw
