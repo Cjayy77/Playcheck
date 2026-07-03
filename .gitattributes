@@ -1,0 +1,3 @@
+# The callback plugin, shell scripts, and fixtures execute on Linux;
+# CRLF checkouts on Windows would break them under WSL/CI.
+* text=auto eol=lf

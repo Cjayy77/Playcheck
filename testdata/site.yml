@@ -1,0 +1,93 @@
+---
+- name: Configure web servers
+  hosts: web
+  gather_facts: false
+  tasks:
+    - name: Write nginx config
+      ansible.builtin.copy:
+        content: |
+          server {
+            listen 80;
+            server_name example.com;
+          }
+        dest: /tmp/playcheck-nginx.conf
+
+    - name: Ensure line in hosts-like file
+      ansible.builtin.lineinfile:
+        path: /tmp/playcheck-hosts
+        line: "10.0.0.5 app.internal"
+        create: true
+
+    - name: Restart nginx (shell, cannot be previewed)
+      ansible.builtin.shell: echo "systemctl restart nginx"
+
+    - name: Run migration script (command, cannot be previewed)
+      ansible.builtin.command: /bin/true
+
+    - name: Write secret config (diff hidden)
+      ansible.builtin.copy:
+        content: "password=supersecret\n"
+        dest: /tmp/playcheck-secret.conf
+      diff: false
+
+    - name: Write API token (no_log)
+      ansible.builtin.copy:
+        content: "token=abc123\n"
+        dest: /tmp/playcheck-token.conf
+      no_log: true
+
+    - name: Skipped by condition
+      ansible.builtin.copy:
+        content: "nope\n"
+        dest: /tmp/playcheck-nope
+      when: false
+
+    - name: Already correct file (no change)
+      ansible.builtin.file:
+        path: /tmp
+        state: directory
+
+    - name: Gather versions (runs for real even in check mode)
+      ansible.builtin.command: uname -r
+      check_mode: false
+      changed_when: false
+
+    - name: Failing assertion (ignored)
+      ansible.builtin.assert:
+        that: "1 == 2"
+      ignore_errors: true
+
+- name: Configure db servers
+  hosts: db
+  gather_facts: false
+  tasks:
+    - name: Set db config
+      ansible.builtin.copy:
+        content: "max_connections=200\n"
+        dest: /tmp/playcheck-db.conf
+      notify:
+        - Write restart flag
+        - Reload db (shell handler, cannot be previewed)
+
+    - name: Vacuum database (shell, cannot be previewed)
+      ansible.builtin.shell: echo "vacuumdb --all"
+
+    - name: Write tuning files (loop)
+      ansible.builtin.copy:
+        content: "{{ item.key }}={{ item.value }}\n"
+        dest: "/tmp/playcheck-tune-{{ item.key }}.conf"
+      loop:
+        - { key: shared_buffers, value: 256MB }
+        - { key: work_mem, value: 16MB }
+
+    - name: Bootstrap agent (raw, cannot be previewed)
+      ansible.builtin.raw: echo bootstrap
+
+  handlers:
+    - name: Write restart flag
+      ansible.builtin.copy:
+        content: "restart pending\n"
+        dest: /tmp/playcheck-restart-flag
+
+    - name: Reload db (shell handler, cannot be previewed)
+      ansible.builtin.shell: echo "pg_ctl reload"

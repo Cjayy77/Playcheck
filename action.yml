@@ -1,0 +1,71 @@
+name: "Playcheck"
+description: >
+  Run ansible-playbook --check --diff and post a readable per-host preview as
+  a PR comment, flagging tasks that cannot be simulated (terraform plan-style).
+branding:
+  icon: "eye"
+  color: "purple"
+
+inputs:
+  playbook:
+    description: "Playbook to preview"
+    required: true
+  inventory:
+    description: "Inventory file or host list"
+    required: true
+  extra-args:
+    description: "Extra arguments passed to ansible-playbook unchanged"
+    default: ""
+  ansible-core-version:
+    description: "ansible-core version to pip install (empty = use preinstalled ansible)"
+    default: ""
+  comment:
+    description: "Post/update the preview as a PR comment (needs pull_request event)"
+    default: "true"
+  github-token:
+    description: "Token used to post the PR comment"
+    default: ${{ github.token }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install playcheck (and ansible-core if requested)
+      shell: bash
+      run: |
+        python3 -m pip install --quiet "${{ github.action_path }}"
+        if [ -n "${{ inputs.ansible-core-version }}" ]; then
+          python3 -m pip install --quiet "ansible-core==${{ inputs.ansible-core-version }}.*"
+        fi
+
+    - name: Run playcheck
+      id: playcheck
+      shell: bash
+      run: |
+        set -o pipefail
+        rc=0
+        playcheck run "${{ inputs.playbook }}" -i "${{ inputs.inventory }}" \
+          --format markdown --quiet -- ${{ inputs.extra-args }} \
+          > "$RUNNER_TEMP/playcheck.md" || rc=$?
+        cat "$RUNNER_TEMP/playcheck.md" >> "$GITHUB_STEP_SUMMARY"
+        echo "report-path=$RUNNER_TEMP/playcheck.md" >> "$GITHUB_OUTPUT"
+        exit $rc
+
+    - name: Post or update PR comment
+      if: ${{ always() && inputs.comment == 'true' && github.event_name == 'pull_request' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        PR: ${{ github.event.pull_request.number }}
+        REPO: ${{ github.repository }}
+      run: |
+        [ -s "$RUNNER_TEMP/playcheck.md" ] || exit 0
+        marker="<!-- playcheck-report -->"
+        existing=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+          --jq ".[] | select(.body | startswith(\"$marker\")) | .id" | head -1)
+        if [ -n "$existing" ]; then
+          gh api -X PATCH "repos/$REPO/issues/comments/$existing" \
+            -F body=@"$RUNNER_TEMP/playcheck.md" >/dev/null
+        else
+          gh api "repos/$REPO/issues/$PR/comments" \
+            -F body=@"$RUNNER_TEMP/playcheck.md" >/dev/null
+        fi

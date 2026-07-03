@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "playcheck"
+version = "0.1.0"
+description = "Readable, per-host summaries of ansible-playbook --check --diff runs, with explicit flagging of tasks that cannot be previewed."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [{ name = "Cedric Eboule" }]
+keywords = ["ansible", "check-mode", "diff", "dry-run", "devops"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: System :: Systems Administration",
+]
+
+[project.scripts]
+playcheck = "playcheck.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Cjayy77/Playcheck"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
