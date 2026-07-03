@@ -35,6 +35,16 @@ Later still (only with real free-tier adoption): a paid hosted dashboard for tea
 - **Re-check market fit periodically.** Before investing further, search for whether Ansible core, `ansible-lint`, or another community tool has shipped a proper visual/PR-friendly diff view since this space could close. Last checked 2026-07-03: space still open (nothing on PyPI or the GitHub Marketplace does check-mode previews with unpreviewable-task flagging).
 - **Version drift guard.** Skip-message text and callback behavior vary across ansible-core versions. Any change to the callback plugin or classifier must pass `scripts/version_matrix.sh` (real runs on 2.15/2.17/2.19 via uv); CI runs the same matrix on every push. Never key classification on exact message text — the fail-safe is "any skip not attributable to a `when:` conditional gets flagged as not previewable" (real example: `raw` skips with no message at all).
 
+## Hosted tier (future, paid — do NOT build before the free CLI has real adoption)
+
+The free CLI and GitHub Action stay open source and self-hosted forever. The paid tier sells the parts a team would rather not run themselves (same shape as GitLab / Sentry / Plausible: open core + paid convenience layer):
+
+- **Hosted dashboard** — previews land in a web UI instead of only a PR comment: full history of every preview across all repos, who ran what and when, diffs over time.
+- **No per-repo CI setup** — connect a GitHub org once instead of adding an Action file to every repo individually.
+- **Team features** — approval workflows for risky changes, Slack notifications, audit logs.
+
+Sequencing guard: this exists here so it's ready when the time comes, not to be started now. Prerequisites before writing any dashboard code: (1) free CLI/Action has real external users, (2) at least a few of them independently ask for history/org-wide views, (3) license decision resolved. The web UI exception to the "stay in CLI/CI terms" rule applies only to this tier — the free product never grows a GUI.
+
 ## License / distribution (context, not implementation-relevant day to day)
 
 License decision deferred as of 2026-07-03 (owner reconsidering MIT vs. alternatives for commercial reasons; repo currently declares no license, i.e. all rights reserved). Original plan was MIT open core — free CLI permissive, paid hosted dashboard closed-source. **A license must be chosen before any visibility push or PyPI publish**; unlicensed repos get no adoption. GitHub Sponsors for funding. Visibility push (r/devops, r/ansible, Ansible forums/Discord, Show HN) only once the CLI actually works well — no parallel marketing before that.
