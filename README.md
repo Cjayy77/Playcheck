@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
  
 Readable previews for `ansible-playbook --check --diff`.
- 
+  
 Ansible's check mode tells you what a playbook *would* change — but the raw
 output is an unstructured scroll, and tasks that can't be simulated  
 (`shell`, `command`, `raw`, …) are silently skipped with the same
