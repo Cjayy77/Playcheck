@@ -1,4 +1,4 @@
-# playcheck 
+# playcheck  
 
 [![CI](https://github.com/Cjayy77/Playcheck/actions/workflows/ci.yml/badge.svg)](https://github.com/Cjayy77/Playcheck/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/playcheck)](https://pypi.org/project/playcheck/)
